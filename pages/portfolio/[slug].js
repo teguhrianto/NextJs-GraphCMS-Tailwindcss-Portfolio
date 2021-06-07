@@ -1,5 +1,8 @@
+import he from "he";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import Image from "next/image";
+import { MDXRemote } from "next-mdx-remote";
+import { serialize } from "next-mdx-remote/serialize";
 
 import { getPortfolioItem, getPortfolioSlugs } from "@/lib/data";
 
@@ -18,15 +21,12 @@ export const getStaticProps = async ({ params }) => {
   return {
     props: {
       portfolioItem: portfolioItem.portfolios[0],
+      content: await serialize(he.decode(portfolioItem.portfolios[0].content)),
     },
   };
 };
 
-export default function Home({ portfolioItem }) {
-  const router = useRouter();
-  if (router.isFallback) {
-    return <div>Loading....</div>;
-  }
+export default function PortfolioDetail({ portfolioItem, content }) {
   console.log(portfolioItem);
   return (
     <>
@@ -36,7 +36,32 @@ export default function Home({ portfolioItem }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1>{portfolioItem.title}</h1>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-0">
+        <h1 className="text-6xl text-gray-900 font-bold">{portfolioItem.title}</h1>
+        <div className="flex justify-between items-center mt-4">
+          <p className="text-gray-700">{new Date(portfolioItem.date).toDateString()}</p>
+          <div className="flex space-x-3">
+            {portfolioItem.tags.map((tag, index) => (
+              <span
+                className="uppercase text-sm tracking-wide m-2 bg-gray-100 px-2 py-1 rounded-lg text-gray-900"
+                key={`tag-${index}`}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <p className="prose prose-xl py-4">{portfolioItem.description}</p>
+        <Image
+          src={portfolioItem.coverImage.url}
+          width={portfolioItem.coverImage.width}
+          height={portfolioItem.coverImage.height}
+          alt={portfolioItem.title}
+        />
+
+        <div className="prose prose-xl max-w-none mt-4">
+          <MDXRemote {...content} />
+        </div>
+      </div>
     </>
   );
 }

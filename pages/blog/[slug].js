@@ -1,11 +1,14 @@
+import he from "he";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import Image from "next/image";
+import { MDXRemote } from "next-mdx-remote";
+import { serialize } from "next-mdx-remote/serialize";
 
-import { getPortfolioItem, getPortfolioSlugs } from "@/lib/data";
+import { getPost, getPostSlugs } from "@/lib/data";
 
 export const getStaticPaths = async () => {
-  const slugsRes = await getPortfolioSlugs();
-  const slugs = slugsRes.portfolios;
+  const slugsRes = await getPostSlugs();
+  const slugs = slugsRes.posts;
   console.log(slugs);
   return {
     paths: slugs.map((slug) => ({ params: { slug: slug.slug } })),
@@ -14,20 +17,17 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps = async ({ params }) => {
-  const portfolioItem = await getPortfolioItem(params.slug);
+  const post = await getPost(params.slug);
   return {
     props: {
-      portfolioItem: portfolioItem.portfolios[0],
+      post: post.posts[0],
+      content: await serialize(he.decode(post.posts[0].content)),
     },
   };
 };
 
-export default function Home({ portfolioItem }) {
-  const router = useRouter();
-  if (router.isFallback) {
-    return <div>Loading....</div>;
-  }
-  console.log(portfolioItem);
+export default function BlogDetail({ post, content }) {
+  console.log(post);
   return (
     <>
       <Head>
@@ -36,7 +36,35 @@ export default function Home({ portfolioItem }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <h1>{portfolioItem.title}</h1>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-0">
+        <h1 className="text-6xl text-gray-900 font-bold">{post.title}</h1>
+        <div className="flex space-x-3 mt-2">
+          {post.tags.map((tag, index) => (
+            <span
+              className="uppercase text-sm tracking-wide m-2 bg-gray-100 px-2 py-1 rounded-lg text-gray-900"
+              key={`tag-${index}`}>
+              {tag}
+            </span>
+          ))}
+        </div>
+        <div className="flex justify-between items-center mb-8">
+          <p className="text-gray-700">{new Date(post.date).toDateString()}</p>
+          <div className="flex items-center">
+            <p className="mr-4 text-gray-800 text-lg font-semibold">{post.author.name}</p>
+            <Image
+              className="rounded-full"
+              src={post.author.image.url}
+              width={35}
+              objectFit="cover"
+              height={35}
+            />
+          </div>
+        </div>
+
+        <div className="prose prose-xl max-w-none">
+          <MDXRemote {...content} />
+        </div>
+      </div>
     </>
   );
 }

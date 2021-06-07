@@ -10,6 +10,7 @@
     "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.4.1",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
@@ -19,10 +20,13 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "graphql": "^15.5.0",
     "graphql-request": "^3.4.0",
+    "he": "^1.2.0",
     "next": "10.2.3",
+    "next-mdx-remote": "^3.0.2",
     "prettier": "^2.3.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "styled-jsx-plugin-postcss": "^4.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.6",

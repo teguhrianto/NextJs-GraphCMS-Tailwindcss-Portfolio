@@ -1,6 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
 
+import Hero from "@/components/Hero";
+
 import { getPostAndPortfolio } from "../lib/data";
 
 export const getStaticProps = async () => {
@@ -22,20 +24,63 @@ export default function Home({ data }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div>
+      <Hero />
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-0">
+        <h3 className="text-4xl mt-10 mb-4 text-gray-900 font-semibold">Recent Projects</h3>
         {data?.portfolios.map((item) => (
           <div key={item.slug}>
-            <Link href={`/portfolio/${item.slug}`}>{item.title}</Link>
+            <Link href={`/portfolio/${item.slug}`}>
+              <a>
+                <div className="relative mb-10 pb-[50%]">
+                  <div className="absolute w-full z-10 h-full opacity-60 bg-green-900"></div>
+                  <div className="absolute w-full z-10 h-full flex justify-center flex-col items-center text-center px-4">
+                    <h3 className="text-white font-semibold text-3xl">{item.title}</h3>
+                    <p className="text-gray-50 text-lg mt-4 leading-relaxed hidden md:flex">
+                      {item.description}
+                    </p>
+                    <div className="mt-4">
+                      {item.tags.map((tag, index) => (
+                        <span
+                          key={`tag-${index}`}
+                          className="text-white uppercase text-sm tracking-wide m-2 bg-green-700 px-2 py-1 rounded-lg">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <img
+                    src={item.coverImage.url}
+                    className="absolute object-cover w-full h-full"
+                    alt={item.title}
+                  />
+                </div>
+              </a>
+            </Link>
           </div>
         ))}
       </div>
 
-      <div className="mt-10">
-        {data?.posts.map((item) => (
-          <div key={item.slug}>
-            <Link href={`/blog/${item.slug}`}>{item.title}</Link>
-          </div>
-        ))}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="mt-20">
+          <h3 className="text-4xl mb-4 text-gray-900 font-semibold">Recent Posts</h3>
+          {data?.posts.map((item) => (
+            <div className="grid grid-cols-1 md:grid-cols-4 py-4" key={item.slug}>
+              <div className="mb-2 md:mb-0 md:col-span-1">
+                <p className="text-gray-600 text-sm">{new Date(item.date).toDateString()}</p>
+              </div>
+              <div className="md:col-span-3">
+                <Link href={`/blog/${item.slug}`}>
+                  <a className="text-2xl font-semibold text-gray-900 hover:text-gray-600 transition-all duration-300 ease-in-out">
+                    {item.title}
+                  </a>
+                </Link>
+                <p className="text-gray-800 leading-relaxed">{item.description}</p>
+                <p className="text-gray-900 text-sm font-semibold mt-1">{item.author.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
